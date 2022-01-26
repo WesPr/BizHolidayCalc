@@ -1,5 +1,3 @@
-# BizHolidayCalc
-
 DayOfWeekEnum
 --------------			
 -> Assigned values 1-7 for each weekday to allow for easy referencing between DayOfWeekEnum and DayOfWeek API.
