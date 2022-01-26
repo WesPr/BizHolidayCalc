@@ -6,6 +6,10 @@ DayTimeRange
 --------------
 -> Overloaded constructor allowing for the use of Enums and Strings.
 
+CurrentDateTime
+--------------
+-> Helper class to reduce boilerplate code.
+
 BusinessHourCalculator 
 --------------    
 -> Use of Hashmap to store days as keys with their respective time ranges.
