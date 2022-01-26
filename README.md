@@ -26,6 +26,13 @@ BusinessHourCalculator
 
 -> And further into Item being dropped off before, during and after business hours.
 
+Output:
+=> Mon Jun 07 11:10:00 2010
+
+=> Thu Jun 10 09:03:00 2010
+
+=> Mon Dec 27 11:00:00 2010
+
 TestBusinessHourCalculator
 --------------
 -> Various Unit Tests.
