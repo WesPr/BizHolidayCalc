@@ -25,3 +25,9 @@
 | TestBusinessHourCalculator |
 +----------------------------+
 -> Various Unit Tests.
+
++------------------------------------------+
+| Remarks on what I feel could be improved |
++------------------------------------------+
+-> calculateDeadline method included a lot of repetitive code, so I created a CurrentDateTime helper class, im sure
+    there is a better way of doing this. Any feedback is appreciated.

@@ -98,14 +98,7 @@ public class BusinessHourCalculator {
      * @return the date that item will be completed.
      */
     public LocalDateTime calculateDeadline(int remainingSeconds, String dropOffTime) {
-        //Parse dropoff time in required format
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-        //Variables
-        LocalDateTime currentDateTime = LocalDateTime.parse(dropOffTime, formatter);
-        LocalDate currentDate = currentDateTime.toLocalDate();
-        LocalTime currentTime = currentDateTime.toLocalTime();
-        DayOfWeek currentDayOfWeek = currentDateTime.getDayOfWeek();
+        CurrentDateTime current = new CurrentDateTime(dropOffTime);
 
         while (remainingSeconds!=0) {
             /*
@@ -115,68 +108,52 @@ public class BusinessHourCalculator {
             */
             for (DayTimeRange day:
                  specificDates) {
-
                 //Closed
-                if(currentDate.isEqual(day.getDate()) && day.isClosed){
-                    //Moving all dates to 00:00 next day
-                    currentDate = currentDate.plusDays(1);
-                    currentDateTime = currentDate.atStartOfDay();
-                    currentTime = currentDateTime.toLocalTime();
-                    currentDayOfWeek =currentDate.getDayOfWeek();
+                if(current.getCurrentDate().isEqual(day.getDate()) && day.isClosed){
+                    //Move to 00:00 next day
+                    current.moveToNextDay();
                 }
-
                 //Open
-                else if(currentDate.isEqual(day.getDate()) && !day.isClosed){
+                else if(current.getCurrentDate().isEqual(day.getDate()) && !day.isClosed){
                     //Calculate seconds between business open and close
                     int daySeconds = (int) ChronoUnit.SECONDS.between(day.getStartTime(),day.getEndTime());
-
                     //Item given before business hours
-                    if(day.getStartTime().isAfter(currentTime)){
+                    if(day.getStartTime().isAfter(current.getCurrentTime())){
                         //Item due on current day
                         if(daySeconds > remainingSeconds) {
-                            currentDateTime = LocalDateTime.of(currentDate, day.getStartTime())
-                                    .plusSeconds(remainingSeconds);
+                           current.setCurrentDateTime(LocalDateTime.of(current.getCurrentDate()
+                                           , day.getStartTime()).plusSeconds(remainingSeconds));
                             remainingSeconds = 0;
                         }
                         else{
                             //Subtracting full day's seconds and moving to next day 00:00.
                             remainingSeconds -= daySeconds;
-                            currentDate = currentDate.plusDays(1);
-                            currentDateTime = currentDate.atStartOfDay();
-                            currentTime = currentDateTime.toLocalTime();
-                            currentDayOfWeek =currentDate.getDayOfWeek();
+                            current.moveToNextDay();
                         }
                     }
                     //Item given during business hours
-                    else if(day.getStartTime().isBefore(currentTime)){
+                    else if(day.getStartTime().isBefore(current.getCurrentTime())){
                         //Seconds between start and end of business hours.
-                        int daysRemainingSeconds = (int) ChronoUnit.SECONDS.between(currentTime,
+                        int daysRemainingSeconds = (int) ChronoUnit.SECONDS.between(current.getCurrentTime(),
                                 day.getEndTime());
                         //Subtract day's remaining seconds and move onto next day 00:00.
                         if(daysRemainingSeconds < remainingSeconds) {
                             remainingSeconds -= daysRemainingSeconds;
-                            currentDate = currentDate.plusDays(1);
-                            currentDateTime = currentDate.atStartOfDay();
-                            currentTime = currentDateTime.toLocalTime();
-                            currentDayOfWeek =currentDate.getDayOfWeek();
+                            current.moveToNextDay();
                         }
                         //Item due today, add remaining seconds to current time.
                         else {
-                            currentDateTime = LocalDateTime.of(currentDate,currentTime)
-                                    .plusSeconds(remainingSeconds);
+                            current.setCurrentDateTime(LocalDateTime.of(current.getCurrentDate()
+                                            ,current.getCurrentTime()).plusSeconds(remainingSeconds));
                             remainingSeconds = 0;
                         }
                     }
                     //Item given after business hours, move onto next day 00:00.
-                    else if(day.getEndTime().isBefore(currentTime)){
-                        currentDate = currentDate.plusDays(1);
-                        currentDateTime = currentDate.atStartOfDay();
-                        currentTime = currentDateTime.toLocalTime();
-                        currentDayOfWeek =currentDate.getDayOfWeek();
+                    else if(day.getEndTime().isBefore(current.getCurrentTime())){
+                        current.moveToNextDay();
                     }
                 }
             }
-
 
             /*
             ---------------
@@ -185,62 +162,49 @@ public class BusinessHourCalculator {
             */
 
             //Does not continue if current date is a date with special hours
-            if(!specificDates.contains(currentDate)) {
+            if(!specificDates.contains(current.getCurrentDate())) {
                 //Get value of day as int
-                DayTimeRange currentDay = WEEKDAYS.get(currentDayOfWeek.getValue());
-
+                DayTimeRange currentDay = WEEKDAYS.get(current.getCurrentDayOfWeek().getValue());
                 //Closed
                 if(currentDay.isClosed){
                     //Move all dates to next day 00:00.
-                    currentDate = currentDate.plusDays(1);
-                    currentDateTime = currentDate.atStartOfDay();
-                    currentTime = currentDateTime.toLocalTime();
-                    currentDayOfWeek =currentDate.getDayOfWeek();
+                    current.moveToNextDay();
                 }
-
                 //Open
                 else{
                     //Item given before open time
-                    if(currentDay.startTime.isAfter(currentTime)){
+                    if(currentDay.startTime.isAfter(current.getCurrentTime())){
                         int daySeconds = (int) ChronoUnit.SECONDS.between(currentDay.getStartTime()
                                 ,currentDay.getEndTime());
                         //Item due today
                         if(daySeconds > remainingSeconds) {
-                            currentDateTime = LocalDateTime.of(currentDate, currentDay.getStartTime())
-                                    .plusSeconds(remainingSeconds);
+                            current.setCurrentDateTime(LocalDateTime.of(current.getCurrentDate()
+                                            , currentDay.getStartTime()).plusSeconds(remainingSeconds));
                             remainingSeconds = 0;
                         }
                         else{
                             //Subtract all day's seconds and move onto next day 00:00.
                             remainingSeconds -= daySeconds;
-                            currentDate = currentDate.plusDays(1);
-                            currentDateTime = currentDate.atStartOfDay();
-                            currentTime = currentDateTime.toLocalTime();
-                            currentDayOfWeek =currentDate.getDayOfWeek();
+                            current.moveToNextDay();
                         }
                     }
                     //Item given during business hours
-                    else if(currentDay.getStartTime().isBefore(currentTime)){
-                        int daySeconds = (int) ChronoUnit.SECONDS.between(currentTime,currentDay.getEndTime());
+                    else if(currentDay.getStartTime().isBefore(current.getCurrentTime())){
+                        int daySeconds = (int) ChronoUnit.SECONDS.between(current.getCurrentTime()
+                                ,currentDay.getEndTime());
                         if(daySeconds < remainingSeconds) {
                             remainingSeconds -= daySeconds;
-                            currentDate = currentDate.plusDays(1);
-                            currentDateTime = currentDate.atStartOfDay();
-                            currentTime = currentDateTime.toLocalTime();
-                            currentDayOfWeek =currentDate.getDayOfWeek();
+                            current.moveToNextDay();
                         }
                         else {
-                            currentDateTime = LocalDateTime.of(currentDate,currentTime)
-                                    .plusSeconds(remainingSeconds);
+                            current.setCurrentDateTime(LocalDateTime.of(current.getCurrentDate()
+                                            ,current.getCurrentTime()).plusSeconds(remainingSeconds));
                             remainingSeconds = 0;
                         }
                     }
                     //Item given after business hours
-                    else if(currentDay.getEndTime().isBefore(currentTime)){
-                        currentDate = currentDate.plusDays(1);
-                        currentDateTime = currentDate.atStartOfDay();
-                        currentTime = currentDateTime.toLocalTime();
-                        currentDayOfWeek =currentDate.getDayOfWeek();
+                    else if(currentDay.getEndTime().isBefore(current.getCurrentTime())){
+                        current.moveToNextDay();
                     }
                 }
             }
@@ -248,11 +212,10 @@ public class BusinessHourCalculator {
 
         //Requested output format
         DateTimeFormatter formatterDTF = DateTimeFormatter.ofPattern(DATE_FORMATTER);
-        String formatDateTime = currentDateTime.format(formatterDTF);
+        String formatDateTime = current.getCurrentDateTime().format(formatterDTF);
         System.out.println("=> " + formatDateTime);
-
         //Return Date
-        return currentDateTime;
+        return current.getCurrentDateTime();
     }
 }
 
