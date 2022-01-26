@@ -1,13 +1,9 @@
 # BizHolidayCalc
 
-+---------------+
-| DayOfWeekEnum |
-+---------------+
+ DayOfWeekEnum 
 -> Assigned values 1-7 for each weekday to allow for easy referencing between DayOfWeekEnum and DayOfWeek API.
 
-+--------------+
-| DayTimeRange |
-+--------------+
+DayTimeRange
 -> Overloaded constructor allowing for the use of Enums and Strings.
 
 +------------------------+
