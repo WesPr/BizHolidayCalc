@@ -19,6 +19,7 @@
 -> Used Varargs for multiple arguments in setClosed methods.
 -> Used While loop to return final completion time upon exhaustion of remaining seconds.
 -> I have split it up into a "SPECIFIC DATES SECTION" & "WEEKDAY SECTION" for easy reading.
+-> And further into Item being dropped off before, during and after business hours.
 
 +----------------------------+
 | TestBusinessHourCalculator |

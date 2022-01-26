@@ -249,7 +249,7 @@ public class BusinessHourCalculator {
         //Requested output format
         DateTimeFormatter formatterDTF = DateTimeFormatter.ofPattern(DATE_FORMATTER);
         String formatDateTime = currentDateTime.format(formatterDTF);
-        System.out.println(formatDateTime);
+        System.out.println("=> " + formatDateTime);
 
         //Return Date
         return currentDateTime;
