@@ -66,6 +66,10 @@ public class DayTimeRange {
      */
     public LocalTime getEndTime() {return endTime;}
 
+    /**
+     * Getter
+     * @return boolean returned true if day is closed.
+     */
     public boolean isClosed() {
         return isClosed;
     }
