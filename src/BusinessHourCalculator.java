@@ -20,8 +20,7 @@ public class BusinessHourCalculator {
         this.specificDates = new HashSet<>();
         //Initialise map with default values
         for (DayOfWeekEnum day : DayOfWeekEnum.values()) {
-            boolean isClosed = false;
-            WEEKDAYS.put(day.getValue(), new DayTimeRange(day, isClosed, defaultOpeningTime,
+            WEEKDAYS.put(day.getValue(), new DayTimeRange(day, false, defaultOpeningTime,
                     defaultClosingTime));
         }
     }
@@ -106,12 +105,12 @@ public class BusinessHourCalculator {
             for (DayTimeRange day:
                  specificDates) {
                 //Closed
-                if(current.getCurrentDate().isEqual(day.getDate()) && day.isClosed){
+                if(current.getCurrentDate().isEqual(day.getDate()) && day.isClosed()){
                     //Move to 00:00 next day
                     current.moveToNextDay();
                 }
                 //Open
-                else if(current.getCurrentDate().isEqual(day.getDate()) && !day.isClosed){
+                else if(current.getCurrentDate().isEqual(day.getDate()) && !day.isClosed()){
                     //Calculate seconds between business open and close
                     int daySeconds = (int) ChronoUnit.SECONDS.between(day.getStartTime(),day.getEndTime());
                     //Item given before business hours
@@ -163,14 +162,14 @@ public class BusinessHourCalculator {
                 //Get value of day as int
                 DayTimeRange currentDay = WEEKDAYS.get(current.getCurrentDayOfWeek().getValue());
                 //Closed
-                if(currentDay.isClosed){
+                if(currentDay.isClosed()){
                     //Move all dates to next day 00:00.
                     current.moveToNextDay();
                 }
                 //Open
                 else{
                     //Item given before open time
-                    if(currentDay.startTime.isAfter(current.getCurrentTime())){
+                    if(currentDay.getStartTime().isAfter(current.getCurrentTime())){
                         int daySeconds = (int) ChronoUnit.SECONDS.between(currentDay.getStartTime()
                                 ,currentDay.getEndTime());
                         //Item due today

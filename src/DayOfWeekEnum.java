@@ -3,7 +3,7 @@ public enum DayOfWeekEnum {
     FRIDAY(5), SATURDAY(6), SUNDAY(7);
 
     //Variables
-    public final int value;
+    private final int value;
 
     /**
      * Constructor

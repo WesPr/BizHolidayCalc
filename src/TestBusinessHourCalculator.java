@@ -20,7 +20,7 @@ public class TestBusinessHourCalculator {
     @Test
     public void defaultHoursTest(){
         LocalTime testTime = LocalTime.parse("09:00");
-        Assert.assertEquals(testTime, businessHourCalculatorTest.getWEEKDAYS().get(1).startTime);
+        Assert.assertEquals(testTime, businessHourCalculatorTest.getWEEKDAYS().get(1).getStartTime());
     }
 
     //Test to see that specific weekday hours are set
@@ -29,7 +29,7 @@ public class TestBusinessHourCalculator {
         businessHourCalculatorTest.setOpeningHours(DayOfWeekEnum.FRIDAY, "10:00"
                 , "17:00");
         LocalTime testTime = LocalTime.parse("10:00");
-        Assert.assertEquals(testTime, businessHourCalculatorTest.getWEEKDAYS().get(5).startTime);
+        Assert.assertEquals(testTime, businessHourCalculatorTest.getWEEKDAYS().get(5).getStartTime());
     }
 
     //Test to see that specific date hours are set
@@ -51,7 +51,7 @@ public class TestBusinessHourCalculator {
     @Test
     public void setClosingHoursTest(){
         businessHourCalculatorTest.setClosed(DayOfWeekEnum.SUNDAY, DayOfWeekEnum.WEDNESDAY);
-        Assert.assertTrue(businessHourCalculatorTest.getWEEKDAYS().get(7).isClosed);
+        Assert.assertTrue(businessHourCalculatorTest.getWEEKDAYS().get(7).isClosed());
     }
 
     //Test to see that closed dates are set correctly
@@ -61,7 +61,7 @@ public class TestBusinessHourCalculator {
         boolean closed = false;
         for (DayTimeRange day : businessHourCalculatorTest.getSpecificDates()) {
             if (day.getDate().isEqual(LocalDate.parse("2010-12-25"))) {
-                closed = day.isClosed;
+                closed = day.isClosed();
             }
             Assert.assertTrue(closed);
         }

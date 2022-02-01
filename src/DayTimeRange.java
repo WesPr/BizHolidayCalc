@@ -4,11 +4,11 @@ import java.time.LocalTime;
 public class DayTimeRange {
 
     //Variables
-    LocalDate date;
-    boolean isClosed;
-    LocalTime startTime;
-    LocalTime endTime;
-    DayOfWeekEnum day;
+    private LocalDate date;
+    private boolean isClosed;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private DayOfWeekEnum day;
 
     /**
      * Constructor
@@ -65,4 +65,8 @@ public class DayTimeRange {
      * @return the date/days close time.
      */
     public LocalTime getEndTime() {return endTime;}
+
+    public boolean isClosed() {
+        return isClosed;
+    }
 }
